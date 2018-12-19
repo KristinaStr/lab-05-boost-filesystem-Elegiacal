@@ -102,8 +102,7 @@ std::map<std::string, Holder> Browse(const boost::filesystem::path& dir)
             {
                 clients[it.first] = it.second;
             }
-        } else
-        {
+        } else {
             std::string filename = dIterator.path().stem().string();
             if (oldCheck(filename) && formatCheck(filename))
             {
