@@ -102,13 +102,12 @@ std::map<std::string, Holder> Browse(const boost::filesystem::path& dir)
             {
                 clients[it.first] = it.second;
             }
-        } 
-        else
+        } else
         {
             std::string filename = dIterator.path().stem().string();
             if (oldCheck(filename) && formatCheck(filename))
             {
-                std::pair<std::string,std::string> p;
+                std::pair<std::string, std::string> p;
                 p.first = dIterator.path().
                 parent_path().stem().string();
                 std::string account = dIterator.
@@ -118,8 +117,7 @@ std::map<std::string, Holder> Browse(const boost::filesystem::path& dir)
                 if (clients.find(account) == clients.end())
                 {
                     clients[account] = Holder(p.first, data);
-                } 
-                else
+                } else
                 {
                     clients[account] = clients[account].update(data);
                 }
