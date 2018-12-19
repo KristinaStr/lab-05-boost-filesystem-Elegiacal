@@ -116,8 +116,7 @@ std::map<std::string, Holder> Browse(const boost::filesystem::path& dir)
                 if (clients.find(account) == clients.end())
                 {
                     clients[account] = Holder(p.first, data);
-                } else
-                {
+                } else {
                     clients[account] = clients[account].update(data);
                 }
                 p.second = dIterator.path().stem().string()
