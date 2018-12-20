@@ -97,8 +97,8 @@ std::map<std::string, Holder> Browse(const boost::filesystem::path& dir)
     {
         if (boost::filesystem::is_directory(dIterator.path()))
         {
-            std::map<std::string, Holder> dir = Browse(dIterator);
-            for (auto& it : dir)
+            std::map<std::string, Holder> directory = Browse(dIterator);
+            for (auto& it : directory)
             {
                 clients[it.first] = it.second;
             }
