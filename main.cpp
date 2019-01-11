@@ -26,7 +26,6 @@ public:
     , files(n)
     , date(d)
     {}
-    
     Holder& update(const std::string& dateNew)
     {
         files += 1;
@@ -58,8 +57,7 @@ bool formatCheck(const std::string& filename)
 {
     if (filename.find("balance") == 0 && filename.size() == 25)
     {
-        int
-        
+        int client;
         client = atoi(filename.substr(8, 8).c_str());
         int date = atoi(filename.substr(17, 8).c_str());
         if (client > 0 && date > 0)
