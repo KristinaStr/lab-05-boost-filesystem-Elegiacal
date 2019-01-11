@@ -26,13 +26,13 @@ public:
     , files(n)
     , date(d)
     {}
-    ~Holder() = default;
-    Holder& update(const std::string& d)
+    
+    Holder& update(const std::string& dateNew)
     {
         files += 1;
-        if (d > date)
+        if (dateNew > date)
         {
-            date = d;
+            date = dateNew;
         }
         return *this;
     }
@@ -44,23 +44,24 @@ public:
     {
         return files;
     }
-    const std::string getDate() const
+    const std::string GetLastDate() const
     {
         return date;
     }
 };
 // Checks
-bool oldCheck(const std::string& fn)
+bool oldCheck(const std::string& filename)
 {
-    return fn.find("old") == std::string::npos;
+    return filename.find("old") == std::string::npos;
 }
-bool formatCheck(const std::string& fn)
+bool formatCheck(const std::string& filename)
 {
-    if (fn.find("balance") == 0 && fn.size() == 25)
+    if (filename.find("balance") == 0 && filename.size() == 25)
     {
-        int client;
-        client = atoi(fn.substr(8, 8).c_str());
-        int date = atoi(fn.substr(17, 8).c_str());
+        int
+        
+        client = atoi(filename.substr(8, 8).c_str());
+        int date = atoi(filename.substr(17, 8).c_str());
         if (client > 0 && date > 0)
         {
             return true;
@@ -68,8 +69,8 @@ bool formatCheck(const std::string& fn)
     }
     return false;
 }
-// Printing
-void filesPrint(std::vector<std::pair<std::string, std::string>> files)
+// Output functions
+void printFiles(std::vector<std::pair<std::string, std::string>> files)
 {
     for (auto& pair : files)
     {
@@ -77,58 +78,57 @@ void filesPrint(std::vector<std::pair<std::string, std::string>> files)
     }
     std::cout << std::endl;
 }
-void Print(const std::map<std::string, Holder>& m)
+void print(const std::map<std::string, Holder>& map)
 {
-    for (auto& pair : m)
-    {
+    for (auto& pair : map) {
         std::cout << "broker : " << pair.second.getBroker() << std::endl;
         std::cout << "client : " << pair.first << std::endl;
         std::cout << "files : " << pair.second.getFiles() << std::endl;
-        std::cout << "date : " << pair.second.getDate() << std::endl;
+        std::cout << "date : " << pair.second.GetLastDate() << std::endl;
     }
 }
-// Browsing logic
+
 std::map<std::string, Holder> Browse(const boost::filesystem::path& dir)
 {
     std::map<std::string, Holder> clients;
     std::vector<std::pair<std::string, std::string>> files;
-    for (const boost::filesystem::directory_entry& dIterator
+    for (const boost::filesystem::directory_entry& directoryIterator
          : boost::filesystem::directory_iterator{dir})
     {
-        if (boost::filesystem::is_directory(dIterator.path()))
+        if (boost::filesystem::is_directory(directoryIterator.path()))
         {
-            std::map<std::string, Holder> directory = Browse(dIterator);
-            for (auto& it : directory)
+            std::map<std::string, Holder> dir = Browse(directoryIterator);
+            for (auto& it : dir)
             {
                 clients[it.first] = it.second;
             }
         } else {
-            std::string filename = dIterator.path().stem().string();
+            std::string filename = directoryIterator.path().stem().string();
             if (oldCheck(filename) && formatCheck(filename))
             {
-                std::pair<std::string, std::string> p;
-                p.first = dIterator.path().
-                parent_path().stem().string();
-                std::string account = dIterator.
+                std::pair<std::string,
+                std::string> pair;
+                pair.first = directoryIterator.path().
+                parent_path().stem().string();  //  broker
+                std::string account = directoryIterator.
                 path().stem().string().substr(8, 8);
-                std::string data = dIterator.
+                std::string data = directoryIterator.
                 path().stem().string().substr(17, 8);
-                if (clients.find(account) == clients.end())
-                {
-                    clients[account] = Holder(p.first, data);
+                if (clients.find(account) == clients.end()) {
+                    clients[account] = Holder(pair.first, data);
                 } else {
                     clients[account] = clients[account].update(data);
                 }
-                p.second = dIterator.path().stem().string()
-                + dIterator.path().extension().string();
-                files.push_back(p);
+                pair.second = directoryIterator.path().stem().string()
+                + directoryIterator.path().extension().string();
+                files.push_back(pair);
             }
         }
     }
-    filesPrint(files);
+    printFiles(files);
     return clients;
 }
-// Main
+
 int main(int args, char* argv[])
 {
     boost::filesystem::path p;
@@ -145,6 +145,6 @@ int main(int args, char* argv[])
             break;
     }
     auto answ = Browse(p);
-    Print(answ);
+    print(answ);
     return 0;
 }
