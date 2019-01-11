@@ -2,61 +2,38 @@ cmake_minimum_required(VERSION 3.4)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-option(BUILD_COVERAGE "Build coverage" OFF)
-
-set(
-  HUNTER_CACHE_SERVERS
-  "https://github.com/bmstu-iu8-cpp-sem-3/hunter-cache"
-  CACHE STRING "Default cache server"
-)
-
 include("tools/gate/cmake/HunterGate.cmake")
 
 huntergate(
-  URL "https://github.com/ruslo/hunter/archive/v0.23.34.tar.gz"
-  SHA1 "70287b1ffa810ee4e952052a9adff9b4856d0d54"
+  URL "https://github.com/ruslo/hunter/archive/v0.23.31.tar.gz"
+  SHA1 "3d94b8522541c4c8eaac606f4c47d09322a8019c"
 )
 
-# TODO: rename project and delete this comment
-project(template)
-string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
+project(lab)
+set(EXECUTABLE_NAME "lab")
+string(APPEND CMAKE_CXX_FLAGS " -pedantic -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
 string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
 
 hunter_add_package(GTest)
+hunter_add_package(Boost COMPONENTS system filesystem)
+find_package(Boost CONFIG REQUIRED system filesystem)
 find_package(GTest CONFIG REQUIRED)
 
-# TODO: change template word to project name and delete this comment
-add_library(template STATIC
-  # enum your files and delete this comment
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
-)
-add_executable(tests
-  # TODO: enum your files and delete this comment
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
+# enum your files and delete this comment
+add_executable( ${EXECUTABLE_NAME}
+        main.cpp
 )
 
-# TODO: change template word to project name and delete this comment
-target_include_directories(template 
+target_include_directories(${EXECUTABLE_NAME}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-target_include_directories(tests 
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-# TODO: change template word to project name and delete this comment
-target_link_libraries(tests GTest::main template)
-
+target_link_libraries(${EXECUTABLE_NAME} GTest::main
+        Boost::system
+        Boost::filesystem)
+target_link_libraries(${EXECUTABLE_NAME}
+        Boost::filesystem
+        Boost::system)
+add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY)
 enable_testing()
-add_test(NAME unit_tests COMMAND tests) 
-
-if(BUILD_COVERAGE)
-  set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-  find_package(codecov)
-  # TODO: change template word to project name and delete this comment
-  add_coverage(template)
-  add_coverage(tests)
-  list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
-  coverage_evaluate()
-endif()
+add_test(NAME unit_tests COMMAND ${EXECUTABLE_NAME})
